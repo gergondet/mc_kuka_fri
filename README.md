@@ -40,11 +40,11 @@ LogPolicy: threaded
 
 # KukaFRI specific configuration
 KukaFRI:
-  ControlMode: Position # Can be: Position/Velocity/Torque
   iiwa14: # Name of the robot in the controller
-    ip: 172.16.0.2 # IP of the robot
+    host: 172.16.0.2 # IP of the robot
   iiwa7: # Name of an extra robot in the controller
-    ip: 172.16.1.2
+    host: host.domain.com
+    port: 30200 # This is the default and can be ommited
   # Actuated robots that are not controlled via mc_kuka_fri
   ignored: [env/door, env/box]
 ```
