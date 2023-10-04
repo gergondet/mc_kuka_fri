@@ -14,6 +14,7 @@ Dependencies
 
 This package requires:
 - [mc_rtc]
+- [mesh_sampling]
 - [iiwa_description]
 - [kuka_fri]
 
@@ -67,3 +68,4 @@ This work was partially supported by the Research Project I.AM. through the Euro
 [iiwa_description]: https://github.com/epfl-lasa/iiwa_ros/tree/master/iiwa_description
 [kuka_fri]: https://github.com/epfl-lasa/kuka_fri
 [mc_rtc]: https://github.com/jrl-umi3218/mc_rtc
+[mesh_sampling]: https://github.com/arntanguy/mesh_sampling

@@ -16,6 +16,12 @@ endif()
 find_program(XACRO xacro REQUIRED)
 message(STATUS "Found xacro: ${XACRO}")
 
+find_program(MESH_SAMPLING mesh_sampling REQUIRED)
+message(STATUS "Found mesh_sampling: ${MESH_SAMPLING}")
+
+find_program(QCONVEX qconvex REQUIRED)
+message(STATUS "Found qconvex: ${QCONVEX}")
+
 include(GNUInstallDirs)
 set(INSTALL_DATADIR ${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME})
 
@@ -44,6 +50,33 @@ function(generate_iiwa_module MODEL)
   set(ALIAS_OUT ${CMAKE_CURRENT_BINARY_DIR}/aliases/${MODEL}.yaml)
   configure_file(aliases/iiwa.in.yaml ${ALIAS_OUT} @ONLY)
   install(FILES ${ALIAS_OUT} DESTINATION ${MC_ROBOTS_ALIASES_DIRECTORY})
+
+  # Generate convex files
+  set(IIWA_LINKS
+    link_0
+    link_1
+    link_2
+    link_3
+    link_4
+    link_5
+    link_6
+    link_7
+  )
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cloud/${MODEL}/)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/convex/${MODEL}/)
+  foreach(LINK ${IIWA_LINKS})
+    set(MESH_IN ${IIWA_DESCRIPTION_PATH}/meshes/${MODEL}/visual/${LINK}.stl)
+    set(CLOUD_OUT ${CMAKE_CURRENT_BINARY_DIR}/cloud/${MODEL}/${LINK}.qc)
+    set(CONVEX_OUT ${CMAKE_CURRENT_BINARY_DIR}/convex/${MODEL}/iiwa_${LINK}-ch.txt)
+    add_custom_command(OUTPUT ${CONVEX_OUT}
+      COMMAND ${MESH_SAMPLING} ${MESH_IN} ${CLOUD_OUT} --type xyz --samples 1000
+      COMMAND ${QCONVEX} TI ${CLOUD_OUT} TO ${CONVEX_OUT} Qt o f
+      DEPENDS ${MESH_IN}
+      COMMENT "Generate ${CONVEX_OUT}"
+    )
+    add_custom_target(generate_${MODEL}_${LINK}_convex ALL DEPENDS ${CONVEX_OUT})
+    install(FILES ${CONVEX_OUT} DESTINATION ${INSTALL_DATADIR}/convex/${MODEL}/)
+  endforeach()
 endfunction()
 
 generate_iiwa_module(iiwa7)
